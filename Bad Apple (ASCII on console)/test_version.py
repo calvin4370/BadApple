@@ -1,13 +1,3 @@
-'''
-Version 3 of my Bad Apple program
-Bad Apple but in ASCII on console
-
-Written from scratch after learning the theory behind "Bad Apple Programs" from:
-- CalvinLoke's touhou_bad_apple_v4.0.py, Github: https://github.com/CalvinLoke/bad-apple
-- LordTony's youtube video: https://www.youtube.com/watch?v=FkNkOVj7suo
-
-mp4 and mp3 sourced from Bad Apple Youtube video: https://www.youtube.com/watch?v=FtutLA63Cp8
-'''
 import cv2
 from PIL import Image
 import os
@@ -20,8 +10,8 @@ from inputvalidation import get_int
 mp4 = 'assets/badapple.mp4'
 mp3 = 'assets/badapple.mp3'
 raw_video_width, raw_video_height = 480, 360
-fps = 30
 total_frames = 6572
+fps = 30
 
 # Dimensions (characters) of each console frame (referred to as viewport for ease of use)
 console_frame_width, console_frame_height = 160, 45
@@ -43,20 +33,13 @@ def prepare_start():
         draw_viewport(console_frame_width, console_frame_height)
         print(f'Viewport width: {console_frame_width}, height: {console_frame_height} (in characters)')
         print('*** Adjust your terminal window size and zoom level to fit the viewport above ***')
+        print('To customise viewport dimensions, enter "c"')
         confirmation = input('Enter anything else when ready: ')
 
-        if confirmation.lower() == 'c':
-            print('The default 160 by 45 characters is safe for most systems to run, 320 by 75 is possible for good systems')
-            print('Anything higher may lead to <30fps and audio syncing issues')
-            print('To customise viewport dimensions, enter "c"')
-            print('Resizing the box bigger while zoomed in may lead to the box misshaping, enter "r" to redraw the box with selected dimensions')
+        if confirmation == 'c':
             new_width = get_int(f'New width of viewport (in characters) (0-{raw_video_width}): ', min=0, max=raw_video_width)
             new_height = get_int(f'New height of viewport (in characters) (0-{int(raw_video_height/2)}): ', min=0, max=raw_video_height/2)
             resize_viewport(new_width, new_height)
-
-            
-            continue
-        elif confirmation.lower() == 'r':
             continue
         else:
             return
@@ -107,18 +90,17 @@ def get_ASCII(pixel):
     r, g, b = pixel
     grey = (r + g + b) / 3
 
-    # These values are arbitrary
     if grey > 250:
         return '@'
     elif 220 < grey <= 250:
         return '#'
     elif 128 < grey <= 220:
         return '+'
-    elif 48 < grey <= 128:
+    elif 32 < grey <= 128:
         return '~'
-    elif 16 < grey <= 48:
+    elif 24 < grey <= 32:
         return '-'
-    elif 8 < grey <= 16:
+    elif 8 < grey <= 24:
         return '.'
     elif grey <= 8:
         return ' '
@@ -129,12 +111,15 @@ def get_ASCII(pixel):
 
 def play_video(path):
     '''
-    Plays the ASCII Version of Bad Apple on the console
+    Plays the ASCII Version of Bad Apple
     '''
     print('Reading video file...')
     video_capture = cv2.VideoCapture(path)
 
     os.system('clear')
+
+    # Testing
+    frame_times = []
 
     # Use the fpstimer library to ensure the video runs at 30 fps
     timer = fpstimer.FPSTimer(fps)
@@ -146,29 +131,72 @@ def play_video(path):
     for frame_number in range(1, total_frames + 1):
         success, raw_frame = video_capture.read()
         
+        # Testing
+        frame_start = time.time()
         try:
             image = Image.fromarray(raw_frame)
         except AttributeError:
             break # if video.mp4 finishes unexpectedly early
 
+        # Gets sizes of the video
+        # for badapple.mp4 its 480 by 360 pixels
+        # width, height = image.size
+
         buffer = ''
+        
         for y in range(0, raw_video_height, y_interval):
             for x in range(0, raw_video_width, x_interval):
                 # Add an ASCII character to the console frame buffer according to its darkness
                 buffer += get_ASCII(image.getpixel((x, y)))
             buffer += '\n'
+        
+        # if frame_number % 100 == 0 or frame_number == 6572:
+        #     print(f'frame {frame_number} rendered')
+        #     print(f'raw width: {raw_video_width}, console frame width: {raw_video_width/2}')
+        #     print(f'raw height: {raw_video_height}, console frame height: {raw_video_height/4}\n')
 
         # Puts the cursor at terminal position 0, 0 (bottom left)
         os.system(f'tput cup 0 0')
         print(buffer)
+
+        # Testing
+        frame_time = time.time() - frame_start
     
-        # Delays so as to maintain 30fps to match audio if CPU is able to render faster than 30 fps
         timer.sleep()
+
+        # Testing
+        frame_time_constrained = time.time() - frame_start
+        
+        frame_times.append({
+            'frame_num': frame_number,
+            'frame_time': round(frame_time, 3),
+            'frame_time_constrained': round(frame_time_constrained, 3)
+        })
+
+        if frame_number == 1800:
+            os.system('clear')
+
+            with open('frame_times.txt', 'w') as file:
+                total_frame_time = 0
+                total_constrained_time = 0
+                content = ''
+                for dict in frame_times:
+                    total_frame_time += dict['frame_time']
+                    total_constrained_time += dict['frame_time_constrained']
+                    content += f'frame: {dict['frame_num']}, frame_time: {round(dict['frame_time'], 3)}s\n'
+                content += f'\nTotal frames: {len(frame_times)}\n'
+                content += f'Total time: {round(total_frame_time, 2)}s\n'
+                content += f'Average fps: {round(len(frame_times)/total_frame_time, 1)}\n'
+                content += f'\nConstrained Total time: {round(total_constrained_time, 2)}s\n'
+                content += f'Constrained fps: {round(len(frame_times)/total_constrained_time, 1)}\n'
+                file.write(content)
+                
+            print(f"Testing concluded, stats of {frame_number} frames recorded in frame_times.txt")
+            quit()
     
     # End of video playback
     os.system('clear')
     print("--- Video played for %s seconds ---" % (time.time() - start_time))
-
 
 def play_audio(path):
     '''

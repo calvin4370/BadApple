@@ -11,7 +11,8 @@ mp4 and mp3 sourced from Bad Apple Youtube video: https://www.youtube.com/watch?
 import cv2
 from PIL import Image
 import os
-import playsound
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide" # Prevents pygame's welcome message
+import pygame
 import fpstimer
 import time
 from inputvalidation import get_int
@@ -53,6 +54,7 @@ def prepare_start():
             new_width = get_int(f'New width of viewport (in characters) (0-{raw_video_width}): ', min=0, max=raw_video_width)
             new_height = get_int(f'New height of viewport (in characters) (0-{int(raw_video_height/2)}): ', min=0, max=raw_video_height/2)
             resize_viewport(new_width, new_height)
+            print('Resizing the box bigger while zoomed in may lead to the box misshaping, enter "r" to redraw the box with selected dimensions')
 
             
             continue
@@ -172,9 +174,13 @@ def play_video(path):
 
 def play_audio(path):
     '''
-    Plays the badapple.mp3 audio
+    Plays the mp3 audio
     '''
-    playsound.playsound('assets/badapple.mp3')
+    pygame.init()
+    pygame.mixer.pre_init(44100, -16, 2, 2048)
+    pygame.mixer.init()
+    pygame.mixer.music.load(path)
+    pygame.mixer.music.play()
 
 
 if __name__ == '__main__':

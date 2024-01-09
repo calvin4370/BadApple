@@ -211,7 +211,7 @@ def play_video(path):
     print("--- Video played for %s seconds ---" % (time.time() - start_time))
 
 
-# Plays audio asychronously using pygame libraryc
+# Plays audio asychronously using pygame library
 def play_audio(path):
     pygame.init()
     pygame.mixer.pre_init(44100, -16, 2, 2048)

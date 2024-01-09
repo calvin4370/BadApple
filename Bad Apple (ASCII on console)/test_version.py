@@ -202,7 +202,7 @@ def play_audio(path):
     '''
     Plays the badapple.mp3 audio
     '''
-    playsound.playsound('assets/badapple.mp3')
+    playsound.playsound('assets/badapple.mp3', False)
 
 
 if __name__ == '__main__':

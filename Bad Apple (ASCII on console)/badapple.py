@@ -31,7 +31,7 @@ def main():
     prepare_start()
 
     play_audio(mp3)
-    global start_time
+    global start_time # To measure how long the ascii video played to calculated delay
     start_time = time.time()
     play_video(mp4)
 
@@ -44,22 +44,23 @@ def prepare_start():
         draw_viewport(console_frame_width, console_frame_height)
         print(f'Viewport width: {console_frame_width}, height: {console_frame_height} (in characters)')
         print('*** Adjust your terminal window size and zoom level to fit the viewport above ***')
+        print('To customise viewport dimensions, enter "c"')
+        print('Resizing the box bigger while zoomed in may lead to the box misshaping, enter "r" to redraw the box with selected dimensions')
         confirmation = input('Enter anything else when ready: ')
 
         if confirmation.lower() == 'c':
             print('The default 160 by 45 characters is safe for most systems to run, 320 by 75 is possible for good systems')
             print('Anything higher may lead to <30fps and audio syncing issues')
-            print('To customise viewport dimensions, enter "c"')
-            print('Resizing the box bigger while zoomed in may lead to the box misshaping, enter "r" to redraw the box with selected dimensions')
+    
             new_width = get_int(f'New width of viewport (in characters) (0-{raw_video_width}): ', min=0, max=raw_video_width)
             new_height = get_int(f'New height of viewport (in characters) (0-{int(raw_video_height/2)}): ', min=0, max=raw_video_height/2)
             resize_viewport(new_width, new_height)
             print('Resizing the box bigger while zoomed in may lead to the box misshaping, enter "r" to redraw the box with selected dimensions')
-
-            
             continue
+
         elif confirmation.lower() == 'r':
             continue
+
         else:
             return
 
@@ -145,8 +146,12 @@ def play_video(path):
     x_interval = round(raw_video_width / console_frame_width)
     y_interval = round(raw_video_height / console_frame_height)
 
+    render_time = 0 # To measure time taken to render each frame so as to keep track of computed fps
     for frame_number in range(1, total_frames + 1):
         success, raw_frame = video_capture.read()
+
+        # To measure time taken for computer to render 1 ascii frame from raw video, to calculate computated fps
+        frame_start_time = time.time()
         
         try:
             image = Image.fromarray(raw_frame)
@@ -163,13 +168,19 @@ def play_video(path):
         # Puts the cursor at terminal position 0, 0 (bottom left)
         os.system(f'tput cup 0 0')
         print(buffer)
+
+        # Measures time taken to render each frame to keep track of computed fps
+        render_time += time.time() - frame_start_time
     
         # Delays so as to maintain 30fps to match audio if CPU is able to render faster than 30 fps
         timer.sleep()
     
     # End of video playback
     os.system('clear')
-    print("--- Video played for %s seconds ---" % (time.time() - start_time))
+    time_elapsed = time.time() - start_time
+    print(f"--- Video played for {int(time_elapsed // 60)} min {round(time_elapsed % 60), 1} s ---")
+    print(f"Computated fps: {round(total_frames/render_time, 1)}")
+    print(f"Constrained (displayed) fps: {round(total_frames/time_elapsed, 1)}")
 
 
 def play_audio(path):

@@ -1,0 +1,3 @@
+To add to badapple_original.py:
+- allow option to customise viewport dimensions in characters
+- allow option to change video

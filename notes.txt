@@ -1,1 +1,3 @@
 To add to badapple_original.py:
+- Script only runs on linux terminals, add functionality to detect terminal type and run terminal commands accordingly
+- consider putting play_audio into play_video to reduce audio syncing error

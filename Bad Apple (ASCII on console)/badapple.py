@@ -1,12 +1,13 @@
 '''
 Version 3 of my Bad Apple program
-Bad Apple but in ASCII on console
+Bad Apple but on console in ASCII characters
 
 Written from scratch after learning the theory behind "Bad Apple Programs" from:
+- Junferno's youtube channel: https://www.youtube.com/@Junferno
 - CalvinLoke's touhou_bad_apple_v4.0.py, Github: https://github.com/CalvinLoke/bad-apple
 - LordTony's youtube video: https://www.youtube.com/watch?v=FkNkOVj7suo
 
-mp4 and mp3 sourced from Bad Apple Youtube video: https://www.youtube.com/watch?v=FtutLA63Cp8
+Raw video sourced from Bad Apple Youtube video: https://www.youtube.com/watch?v=FtutLA63Cp8
 
 Instructions to use
 -------------------
@@ -22,6 +23,7 @@ from PIL import Image
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide" # Prevents pygame's welcome message
 import pygame
+from moviepy.editor import *
 import fpstimer
 import time
 from inputvalidation import get_int, get_string
@@ -36,13 +38,27 @@ total_frames = 6572
 # Dimensions (characters) of each console frame (referred to as viewport for ease of use)
 console_frame_width, console_frame_height = 160, 45
 
+
 def main():
     prepare_start()
 
+    get_mp3(mp4)
+
+    # For debug purposes to measure how long the ascii video played to calculated delay
+    global before_audio_start_time, after_audio_start_time, video_start_time, show_debug_info_at_end
+    show_debug_info_at_end = True
+
+    # Start playing mp3 asynchronously (i.e. start mp3 then immediately start mp4)
+    before_audio_start_time = time.time()
     play_audio(mp3)
-    global start_time # To measure how long the ascii video played to calculated delay
-    start_time = time.time()
+    after_audio_start_time = time.time()
+
+    global video_start_time # To measure how long the ascii video played to calculated delay
+    video_start_time = time.time()
     play_video(mp4)
+
+    if show_debug_info_at_end:
+        show_debug_info()
 
 
 def prepare_start():
@@ -81,6 +97,12 @@ def prepare_start():
                 print("mp4 file not found")
                 time.sleep(2)
                 continue
+        
+        elif confirmation.lower() == 'd':
+            show_debug_info_at_end = True
+            print(f'\nExtra Debug Information will be displayed at the end of the video')
+            time.sleep(2)
+            continue
 
         else:
             return
@@ -88,8 +110,8 @@ def prepare_start():
 
 def draw_viewport(width, height):
     '''
-    Prints out a (width by height) characters ASCII box to allow user to adjust their console
-    zoom to fit the viewport for the video to play in the console
+    Prints out a (width by height) characters ASCII box to allow user to adjust their console zoom
+    to fit the viewport for the video to play in the console
     '''
     os.system('clear')
     viewport = ''
@@ -175,7 +197,7 @@ def play_video(path):
     # Use the fpstimer library to ensure the console video runs at raw video's fps
     timer = fpstimer.FPSTimer(fps)
 
-    render_time = 0 # To measure time taken to render each frame so as to keep track of computed fps
+    total_render_time = 0 # To measure time taken to render each frame so as to keep track of computed fps
     for frame_number in range(1, total_frames + 1):
         success, raw_frame = video_capture.read()
 
@@ -199,14 +221,36 @@ def play_video(path):
         print(buffer)
 
         # Measures time taken to render each frame to keep track of computed fps
-        render_time += time.time() - frame_start_time
+        total_render_time += time.time() - frame_start_time
     
         # Delays so as to maintain 30fps to match audio if CPU is able to render faster than 30 fps
         timer.sleep()
     
     # End of video playback
-    time_elapsed = time.time() - start_time
-    show_video_info(time_elapsed, total_frames, render_time)
+    time_elapsed = time.time() - video_start_time
+    show_video_info(time_elapsed, total_frames, total_render_time)
+
+
+def get_mp3(path):
+    '''
+    Creates an mp3 file from an mp4 file, so only the mp4 file has to be provided at the start of the program
+    '''
+    global mp3
+
+    video = VideoFileClip(path)
+    video.audio.write_audiofile("assets/audio.mp3")
+    mp3 = "assets/audio.mp3"
+
+
+def play_audio(path):
+    '''
+    Plays the mp3 audio
+    '''
+    pygame.init()
+    pygame.mixer.pre_init(buffer=2048) # Idk what this does, got this from CalvinLoke
+    pygame.mixer.init()
+    pygame.mixer.music.load(path)
+    pygame.mixer.music.play()
 
 
 def show_video_info(time_elapsed, total_frames, render_time):
@@ -216,28 +260,28 @@ def show_video_info(time_elapsed, total_frames, render_time):
     os.system('clear')
 
     # Raw Video Information
-    print("----- Raw Video Information -----")
-    print(f"mp4 provided: {mp4}")
-    print(f"Video length: {int(video_length // 60)} min {round(video_length % 60, 1)} s")
-    print(f"Original resolution: {raw_video_width}x{raw_video_height}p")
-    print(f"Original fps: {round(fps, 1)}")
+    print('----- Raw Video Information -----')
+    print(f'mp4 provided: {mp4}')
+    print(f'Video length: {int(video_length // 60)} min {round(video_length % 60, 1)} s')
+    print(f'Original resolution: {raw_video_width}x{raw_video_height}p')
+    print(f'Original fps: {round(fps, 1)}')
 
     # Computation Information
-    print("\n----- Video Conversion Information -----")
-    print(f"Video played for {int(time_elapsed // 60)} min {round(time_elapsed % 60, 1)} s")
-    print(f"Computated fps: {round(total_frames/render_time, 1)}")
-    print(f"Constrained (displayed) fps: {round(total_frames/time_elapsed, 1)}")
+    print('\n----- Video Conversion Information -----')
+    print(f'Video played for {int(time_elapsed // 60)} min {round(time_elapsed % 60, 1)} s')
+    print(f'Computated fps: {round(total_frames/render_time, 1)}')
+    print(f'Constrained (displayed) fps: {round(total_frames/time_elapsed, 1)}')
 
 
-def play_audio(path):
+def show_debug_info():
     '''
-    Plays the mp3 audio
+    Prints to the console extra debug information for testing at the end of the video
+    (Optional)
     '''
-    pygame.init()
-    pygame.mixer.pre_init(44100, -16, 2, 2048)
-    pygame.mixer.init()
-    pygame.mixer.music.load(path)
-    pygame.mixer.music.play()
+    print()
+    print('----- DEBUG INFORMATION -----')
+    print(f'Time taken for play_audio to run asynchronously: {round(before_audio_start_time-after_audio_start_time, 3)}s')
+    print(f'Time between play_audio and play_video (delay): {round(video_start_time-after_audio_start_time, 3)}s')
 
 
 if __name__ == '__main__':

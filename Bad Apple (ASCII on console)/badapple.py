@@ -27,8 +27,8 @@ import time
 from inputvalidation import get_int, get_string
 
 # Raw Video Stats (Default for bad apple, play_video() will adjust these values)
-mp4 = 'assets/badapple.mp4'
-mp3 = 'assets/badapple.mp3'
+mp4 = 'assets/nakamaka.mp4'
+mp3 = 'assets/nakamaka.mp3'
 raw_video_width, raw_video_height = 480, 360
 fps = 30
 total_frames = 6572
@@ -58,7 +58,7 @@ def prepare_start():
         confirmation = input('Enter anything else when ready: ')
 
         if confirmation.lower() == 'c':
-            print('The default 160 by 45 characters is safe for most systems to run, 320 by 75 is possible for good systems')
+            print('\nThe default 160 by 45 characters is safe for most systems to run, 320 by 75 is possible for good systems')
             print('Anything higher may lead to <30fps and audio syncing issues')
     
             new_width = get_int(f'New width of viewport (in characters) (0-{raw_video_width}): ', min=0, max=raw_video_width)
@@ -161,11 +161,12 @@ def play_video(path):
     os.system('clear')
 
     # Confirm video information with the raw mp4
-    global raw_video_width, raw_video_height, fps, total_frames
+    global raw_video_width, raw_video_height, fps, total_frames, video_length
     raw_video_width = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
     raw_video_height = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = video_capture.get(cv2.CAP_PROP_FPS)
     total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    video_length = total_frames / fps
 
     # Interval between pixels in raw video converted to ASCII
     x_interval = round(raw_video_width / console_frame_width)
@@ -204,9 +205,26 @@ def play_video(path):
         timer.sleep()
     
     # End of video playback
-    os.system('clear')
     time_elapsed = time.time() - start_time
-    print(f"--- Video played for {int(time_elapsed // 60)} min {round(time_elapsed % 60, 1)} s ---")
+    show_video_info(time_elapsed, total_frames, render_time)
+
+
+def show_video_info(time_elapsed, total_frames, render_time):
+    '''
+    Prints to the console information about the raw mp4 used and computation information
+    '''
+    os.system('clear')
+
+    # Raw Video Information
+    print("----- Raw Video Information -----")
+    print(f"mp4 provided: {mp4}")
+    print(f"Video length: {int(video_length // 60)} min {round(video_length % 60, 1)} s")
+    print(f"Original resolution: {raw_video_width}x{raw_video_height}p")
+    print(f"Original fps: {round(fps, 1)}")
+
+    # Computation Information
+    print("\n----- Video Conversion Information -----")
+    print(f"Video played for {int(time_elapsed // 60)} min {round(time_elapsed % 60, 1)} s")
     print(f"Computated fps: {round(total_frames/render_time, 1)}")
     print(f"Constrained (displayed) fps: {round(total_frames/time_elapsed, 1)}")
 

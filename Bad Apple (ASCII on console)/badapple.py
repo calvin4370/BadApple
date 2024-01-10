@@ -71,11 +71,11 @@ def prepare_start():
             continue
 
         elif confirmation.lower() == 'v':
+            global mp4
             print(f'\nCurrent video: {mp4}')
             new_video = get_string('Enter path to desired mp4: ')
 
             if os.path.exists(new_video):
-                global mp4
                 mp4 = new_video
             else:
                 print("mp4 file not found")
@@ -140,9 +140,9 @@ def get_ASCII(pixel):
         return '+'
     elif 48 < grey <= 128:
         return '~'
-    elif 16 < grey <= 48:
+    elif 24 < grey <= 48:
         return '-'
-    elif 8 < grey <= 16:
+    elif 8 < grey <= 24:
         return '.'
     elif grey <= 8:
         return ' '

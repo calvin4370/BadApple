@@ -29,8 +29,8 @@ import time
 from inputvalidation import get_int, get_string
 
 # Raw Video Stats (Default for bad apple, play_video() will adjust these values)
-mp4 = 'assets/nakamaka.mp4'
-mp3 = 'assets/nakamaka.mp3'
+mp4 = 'assets/badapple.mp4'
+mp3 = 'assets/badapple.mp3'
 raw_video_width, raw_video_height = 480, 360
 fps = 30
 total_frames = 6572
@@ -45,16 +45,11 @@ def main():
     get_mp3(mp4)
 
     # For debug purposes to measure how long the ascii video played to calculated delay
-    global before_audio_start_time, after_audio_start_time, video_start_time, show_debug_info_at_end
+    global before_audio_start_time, after_audio_start_time, show_debug_info_at_end
     show_debug_info_at_end = True
 
     # Start playing mp3 asynchronously (i.e. start mp3 then immediately start mp4)
-    before_audio_start_time = time.time()
     play_audio(mp3)
-    after_audio_start_time = time.time()
-
-    global video_start_time # To measure how long the ascii video played to calculated delay
-    video_start_time = time.time()
     play_video(mp4)
 
     if show_debug_info_at_end:
@@ -197,6 +192,10 @@ def play_video(path):
     # Use the fpstimer library to ensure the console video runs at raw video's fps
     timer = fpstimer.FPSTimer(fps)
 
+    # Start timing ASCII video
+    global video_start_time
+    video_start_time = time.time()
+
     total_render_time = 0 # To measure time taken to render each frame so as to keep track of computed fps
     for frame_number in range(1, total_frames + 1):
         success, raw_frame = video_capture.read()
@@ -223,7 +222,7 @@ def play_video(path):
         # Measures time taken to render each frame to keep track of computed fps
         total_render_time += time.time() - frame_start_time
     
-        # Delays so as to maintain 30fps to match audio if CPU is able to render faster than 30 fps
+        # Delays so as to maintain raw video's fps to match audio if CPU is able to render faster than that
         timer.sleep()
     
     # End of video playback
@@ -246,11 +245,14 @@ def play_audio(path):
     '''
     Plays the mp3 audio
     '''
+    global before_audio_start_time, after_audio_start_time
+    before_audio_start_time = time.time()
     pygame.init()
     pygame.mixer.pre_init(buffer=2048) # Idk what this does, got this from CalvinLoke
     pygame.mixer.init()
     pygame.mixer.music.load(path)
     pygame.mixer.music.play()
+    after_audio_start_time = time.time()
 
 
 def show_video_info(time_elapsed, total_frames, render_time):
@@ -260,14 +262,14 @@ def show_video_info(time_elapsed, total_frames, render_time):
     os.system('clear')
 
     # Raw Video Information
-    print('----- Raw Video Information -----')
+    print('-------- Raw Video Information --------')
     print(f'mp4 provided: {mp4}')
     print(f'Video length: {int(video_length // 60)} min {round(video_length % 60, 1)} s')
     print(f'Original resolution: {raw_video_width}x{raw_video_height}p')
     print(f'Original fps: {round(fps, 1)}')
 
     # Computation Information
-    print('\n----- Video Conversion Information -----')
+    print('\n-------- Video Conversion Information --------')
     print(f'Video played for {int(time_elapsed // 60)} min {round(time_elapsed % 60, 1)} s')
     print(f'Computated fps: {round(total_frames/render_time, 1)}')
     print(f'Constrained (displayed) fps: {round(total_frames/time_elapsed, 1)}')
@@ -279,9 +281,9 @@ def show_debug_info():
     (Optional)
     '''
     print()
-    print('----- DEBUG INFORMATION -----')
-    print(f'Time taken for play_audio to run asynchronously: {round(before_audio_start_time-after_audio_start_time, 3)}s')
-    print(f'Time between play_audio and play_video (delay): {round(video_start_time-after_audio_start_time, 3)}s')
+    print('-------- DEBUG INFORMATION --------')
+    print(f'Time taken for play_audio to run asynchronously: {round(after_audio_start_time-before_audio_start_time, 3)}s')
+    print(f'Time between audio start and video start (delay): {round(video_start_time-after_audio_start_time, 3):.3d}s')
 
 
 if __name__ == '__main__':

@@ -7,6 +7,15 @@ Written from scratch after learning the theory behind "Bad Apple Programs" from:
 - LordTony's youtube video: https://www.youtube.com/watch?v=FkNkOVj7suo
 
 mp4 and mp3 sourced from Bad Apple Youtube video: https://www.youtube.com/watch?v=FtutLA63Cp8
+
+Instructions to use
+-------------------
+Viewport Settings:
+160 by 45 characters is the default viewport size and can comfortably compute the default badapple.mp4 in real time
+Setting the viewport to 320 by 75 characters is possible for good systems
+Anything higher may lead to lower than original fps and thus audio syncing issues
+
+Note these options are tested with the 360p, 30fps badapple.mp4 video
 '''
 import cv2
 from PIL import Image
@@ -15,9 +24,9 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide" # Prevents pygame's welcome me
 import pygame
 import fpstimer
 import time
-from inputvalidation import get_int
+from inputvalidation import get_int, get_string
 
-# Raw Video Stats
+# Raw Video Stats (Default for bad apple, play_video() will adjust these values)
 mp4 = 'assets/badapple.mp4'
 mp3 = 'assets/badapple.mp3'
 raw_video_width, raw_video_height = 480, 360
@@ -44,7 +53,7 @@ def prepare_start():
         draw_viewport(console_frame_width, console_frame_height)
         print(f'Viewport width: {console_frame_width}, height: {console_frame_height} (in characters)')
         print('*** Adjust your terminal window size and zoom level to fit the viewport above ***')
-        print('To customise viewport dimensions, enter "c"')
+        print('To customise viewport dimensions, enter "c". To change video, enter "v"')
         print('Resizing the box bigger while zoomed in may lead to the box misshaping, enter "r" to redraw the box with selected dimensions')
         confirmation = input('Enter anything else when ready: ')
 
@@ -60,6 +69,18 @@ def prepare_start():
 
         elif confirmation.lower() == 'r':
             continue
+
+        elif confirmation.lower() == 'v':
+            print(f'\nCurrent video: {mp4}')
+            new_video = get_string('Enter path to desired mp4: ')
+
+            if os.path.exists(new_video):
+                global mp4
+                mp4 = new_video
+            else:
+                print("mp4 file not found")
+                time.sleep(2)
+                continue
 
         else:
             return
@@ -134,17 +155,24 @@ def play_video(path):
     '''
     Plays the ASCII Version of Bad Apple on the console
     '''
-    print('Reading video file...')
+    # Reading video file
     video_capture = cv2.VideoCapture(path)
 
     os.system('clear')
 
-    # Use the fpstimer library to ensure the video runs at 30 fps
-    timer = fpstimer.FPSTimer(fps)
+    # Confirm video information with the raw mp4
+    global raw_video_width, raw_video_height, fps, total_frames
+    raw_video_width = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+    raw_video_height = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps = video_capture.get(cv2.CAP_PROP_FPS)
+    total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # Interval between pixels in raw video converted to ASCII
     x_interval = round(raw_video_width / console_frame_width)
     y_interval = round(raw_video_height / console_frame_height)
+
+    # Use the fpstimer library to ensure the console video runs at raw video's fps
+    timer = fpstimer.FPSTimer(fps)
 
     render_time = 0 # To measure time taken to render each frame so as to keep track of computed fps
     for frame_number in range(1, total_frames + 1):
@@ -178,7 +206,7 @@ def play_video(path):
     # End of video playback
     os.system('clear')
     time_elapsed = time.time() - start_time
-    print(f"--- Video played for {int(time_elapsed // 60)} min {round(time_elapsed % 60), 1} s ---")
+    print(f"--- Video played for {int(time_elapsed // 60)} min {round(time_elapsed % 60, 1)} s ---")
     print(f"Computated fps: {round(total_frames/render_time, 1)}")
     print(f"Constrained (displayed) fps: {round(total_frames/time_elapsed, 1)}")
 

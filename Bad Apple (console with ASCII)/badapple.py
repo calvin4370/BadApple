@@ -26,7 +26,7 @@ import pygame
 from moviepy.editor import *
 import fpstimer
 import time
-from inputvalidation import get_int, get_string
+from inputvalidate import get_int, get_string
 
 # Raw Video Stats (Default for bad apple, play_video() will adjust these values)
 mp4 = 'assets/badapple.mp4'
@@ -283,7 +283,7 @@ def show_debug_info():
     print()
     print('-------- DEBUG INFORMATION --------')
     print(f'Time taken for play_audio to run asynchronously: {round(after_audio_start_time-before_audio_start_time, 3)}s')
-    print(f'Time between audio start and video start (delay): {round(video_start_time-after_audio_start_time, 3):.3d}s')
+    print(f'Time between audio start and video start (delay): {round(video_start_time-after_audio_start_time, 3)}s')
 
 
 if __name__ == '__main__':

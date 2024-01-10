@@ -1,5 +1,5 @@
 opencv-python
-pillow
+Pillow
 pygame
 moviepy.editor
 fpstimer

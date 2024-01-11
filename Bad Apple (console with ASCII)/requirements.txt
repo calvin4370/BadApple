@@ -3,3 +3,4 @@ Pillow
 pygame
 moviepy.editor
 fpstimer
+inputvalidate

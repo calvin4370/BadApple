@@ -16,7 +16,7 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide" # Prevents pygame's welcome me
 import pygame
 import fpstimer
 import time
-from inputvalidation import get_int
+from inputvalidate import get_int
 
 # Raw Video Stats
 mp4 = 'assets/badapple.mp4'

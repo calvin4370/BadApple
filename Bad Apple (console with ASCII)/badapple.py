@@ -155,7 +155,7 @@ def play_video(path):
     # Reading video file
     video_capture = cv2.VideoCapture(path)
 
-    os.system('clear')
+    os.system('cls')
 
     # Confirm video information with the raw mp4
     global raw_video_width, raw_video_height, fps, total_frames, video_length

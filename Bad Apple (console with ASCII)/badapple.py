@@ -195,8 +195,8 @@ def play_video(path):
                 buffer += get_ASCII(image.getpixel((x, y)))
             buffer += '\n'
 
-        # Puts the cursor at terminal position 0, 0 (bottom left)
-        os.system(f'tput cup 0 0')
+        # Puts the cursor at terminal position 0, 0 (top left) so next frame writes over the previous frame, equivalent to linux's tput cup 0 0
+        print("\033[%d;%dH" % (0, 0), end="")
         print(buffer)
 
         # Measures time taken to render each frame to keep track of computed fps

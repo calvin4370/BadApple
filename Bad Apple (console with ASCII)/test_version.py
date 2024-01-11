@@ -4,7 +4,7 @@ import os
 import playsound
 import fpstimer
 import time
-from inputvalidation import get_int
+from inputvalidate import get_int
 
 # Raw Video Stats
 mp4 = 'assets/badapple.mp4'

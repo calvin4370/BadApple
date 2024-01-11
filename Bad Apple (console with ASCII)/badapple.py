@@ -135,13 +135,13 @@ def get_ASCII(pixel):
         return '#'
     elif 128 < grey <= 220:
         return '+'
-    elif 48 < grey <= 128:
+    elif 64 < grey <= 128:
         return '~'
-    elif 24 < grey <= 48:
+    elif 48 < grey <= 64:
         return '-'
-    elif 8 < grey <= 24:
+    elif 12 < grey <= 48:
         return '.'
-    elif grey <= 8:
+    elif grey <= 12:
         return ' '
     else:
         print(f"A pixel's average rgb has registered as {grey}")

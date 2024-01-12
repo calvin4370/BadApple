@@ -132,9 +132,13 @@ def get_ASCII(pixel):
 
     # These values are arbitrary for greenscreen
     if r <= 50 and g >= 150 and b <= 50:
-        return ' '
+        return ' ' # green screen
     elif r <= 50 and g <= 50 and b >= 150:
-        return ' '
+        return ' ' # blue screen
+    elif r >= 100 and g >= 100 and b <= 100:
+        return ' ' # green eyes
+    elif 100 <= r <= 160 and g >= 200 and b >= 200:
+        return ' ' # blue eyes
         
     if grey > 250:
         return ' '
@@ -143,7 +147,7 @@ def get_ASCII(pixel):
     elif 200 < grey <= 230:
         return '-'
     elif 128 < grey <= 200:
-        return '~'
+        return '~' # This is where the eyes are
     elif 64 < grey <= 128:
         return '+'
     elif 32 < grey <= 64:

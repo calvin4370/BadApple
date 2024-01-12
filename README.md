@@ -1,7 +1,7 @@
 # BadApple
 
-Bad Apple on Console with ASCII
-- navigate into the 'Bad Apple (console with ASCII)' folder and run 'python badapple.py'
+Bad Apple!! but with Python on Console
+See it in action on my youtube channel: https://www.youtube.com/watch?v=JnBS15N19-Y
 
 Written from scratch after learning the theory behind "Bad Apple Programs" from:
 - Junferno's youtube channel: https://www.youtube.com/@Junferno
@@ -12,6 +12,8 @@ Raw video sourced from Bad Apple Youtube video: https://www.youtube.com/watch?v=
 
 Instructions to use
 -------------------
+- navigate into the 'Bad Apple (console with ASCII)' folder and run 'python badapple.py'
+
 Viewport Settings:
 160 by 45 characters is the default viewport size and can comfortably compute the default badapple.mp4 in real time
 Setting the viewport to 320 by 75 characters is possible for good systems

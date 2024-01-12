@@ -9,7 +9,7 @@ import time
 from inputvalidate import get_int, get_string
 
 # Raw Video Stats (Default for bad apple, play_video() will adjust these values)
-mp4 = 'assets/toothless.mp4'
+mp4 = 'assets/tooth.mp4'
 mp3 = 'assets/badapple.mp3'
 raw_video_width, raw_video_height = 480, 360
 fps = 30
@@ -133,11 +133,11 @@ def get_ASCII(pixel):
     # These values are arbitrary for greenscreen
     if r <= 50 and g >= 150 and b <= 50:
         return ' ' # green screen
-    elif r <= 50 and g <= 100 and b >= 175:
-        return ' ' # blue screen
-    elif r >= 100 and g >= 100 and b <= 100:
+    if r <= 50 and g <= 100 and b >= 100:
+        return 'P' # blue screen
+    if r >= 100 and g >= 100 and b <= 100:
         return ' ' # green eyes
-    elif 100 <= r <= 160 and g >= 200 and b >= 200:
+    if 100 <= r <= 160 and g >= 200 and b >= 200:
         return ' ' # blue eyes
         
     if grey > 250:
@@ -148,7 +148,9 @@ def get_ASCII(pixel):
         return '-'
     elif 128 < grey <= 200:
         return '~' # This is where the eyes are
-    elif 64 < grey <= 128:
+    elif 90 < grey <= 128:
+        return ' '
+    elif 64 < grey <= 90:
         return '+'
     elif 32 < grey <= 64:
         return '#'

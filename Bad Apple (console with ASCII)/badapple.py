@@ -126,7 +126,9 @@ def get_ASCII(pixel):
     Returns an ASCII character depending on the average rgb of the pixel
     '''
     r, g, b = pixel
-    grey = (r + g + b) / 3
+    avg = (r + g + b) / 3
+    # NTSC formula for luminance
+    grey = 0.299*r + 0.587*g + 0.114*b
 
     # These values are arbitrary
     if grey > 250:

@@ -1,6 +1,6 @@
 opencv-python
 Pillow
 pygame
-moviepy.editor
+moviepy
 fpstimer
 inputvalidate

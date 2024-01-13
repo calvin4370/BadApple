@@ -247,7 +247,7 @@ def get_mp3(path):
     '''
     global mp3
 
-    video = VideoFileClip(path)
+    video = VideoFileClip(f'assets/{path}')
     video.audio.write_audiofile("assets/audio.mp3")
     mp3 = "assets/audio.mp3"
 

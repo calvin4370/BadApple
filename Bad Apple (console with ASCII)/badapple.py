@@ -9,8 +9,8 @@ import time
 from inputvalidate import get_int, get_string
 
 # Raw Video Stats (Default for bad apple, play_video() will adjust these values)
-mp4 = 'assets/badapple.mp4'
-mp3 = 'assets/badapple.mp3'
+mp4 = 'badapple.mp4'
+mp3 = 'badapple.mp3'
 raw_video_width, raw_video_height = 480, 360
 fps = 30
 total_frames = 6572
@@ -184,7 +184,7 @@ def play_video(path):
     Plays the ASCII Version of Bad Apple on the console
     '''
     # Reading video file
-    video_capture = cv2.VideoCapture(path)
+    video_capture = cv2.VideoCapture(f'assets/{path}')
 
     os.system('cls')
 

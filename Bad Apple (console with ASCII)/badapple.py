@@ -129,21 +129,50 @@ def get_ASCII(pixel):
     avg = (r + g + b) / 3
     # NTSC formula for luminance
     grey = 0.299*r + 0.587*g + 0.114*b
+    # `^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$
 
     # These values are arbitrary
     if grey > 250:
         return '@'
-    elif 220 < grey <= 250:
+    elif 245 < grey <= 250:
+        return 'B'
+    elif 240 < grey <= 245:
+        return '%'
+    elif 235 < grey <= 240:
+        return '8'
+    elif 230 < grey <= 235:
+        return '&'
+    elif 225 < grey <= 230:
+        return 'W'
+    elif 220 < grey <= 225:
+        return 'M'
+    elif 215 < grey <= 220:
         return '#'
-    elif 128 < grey <= 220:
+    elif 200 < grey <= 215:
+        return '*'
+    elif 180 < grey <= 200:
+        return 'o'
+    elif 144 < grey <= 180:
+        return '?'
+    elif 128 < grey <= 144:
         return '+'
-    elif 64 < grey <= 128:
+    elif 96 < grey <= 128:
         return '~'
-    elif 32 < grey <= 64:
+    elif 64 < grey <= 96:
+        return 'I'
+    elif 48 < grey <= 64:
+        return 'i'
+    elif 32 < grey <= 48:
+        return '!'
+    elif 24 < grey <= 32:
         return '-'
-    elif 10 < grey <= 32:
-        return '.'
-    elif grey <= 10:
+    elif 16 < grey <= 24:
+        return ';'
+    elif 10 < grey <= 16:
+        return ':'
+    elif 6 < grey <= 10:
+        return '`'
+    elif grey <= 6:
         return ' '
     else:
         print(f"A pixel's average rgb has registered as {grey}")

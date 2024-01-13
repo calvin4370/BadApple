@@ -66,7 +66,7 @@ def prepare_start():
             print(f'\nCurrent video: {mp4}')
             new_video = get_string('Enter path to desired mp4: ')
 
-            if os.path.exists(new_video):
+            if os.path.exists(f'assets/{new_video}'):
                 mp4 = new_video
             else:
                 print("mp4 file not found")

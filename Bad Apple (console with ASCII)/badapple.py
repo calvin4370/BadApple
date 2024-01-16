@@ -9,7 +9,7 @@ import time
 from inputvalidate import get_int, get_string
 
 # Raw Video Stats (Default for bad apple, play_video() will adjust these values)
-mp4 = 'badapple.mp4'
+mp4 = 'loli_god.mp4'
 mp3 = 'badapple.mp3'
 raw_video_width, raw_video_height = 480, 360
 fps = 30
